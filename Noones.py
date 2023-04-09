@@ -47,7 +47,7 @@ def initialise():
 
 def run():
     global token
-    response = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', "Authorization": "Bearer {0}".format(token)})
+    response = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token)})
     #print(response.json())
     if (response.status_code == 200):
         #print(response.json())
@@ -59,7 +59,9 @@ def run():
         raise Exception("({0})Error validating access token {1}".format(response.status_code, response.json()))
 
 initialise()
-
+run()
+"""
 while True:
     run()
     time.sleep(60)
+"""
