@@ -48,7 +48,6 @@ def initialise():
 def run():
     global token
     response = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', "Authorization": "Bearer {0}".format(token)})
-    print(response.text)
     print(response.json())
     if (response.status_code == 200):
         #print(response.json())
