@@ -51,7 +51,7 @@ def run():
     if (response.status_code == 200):
         #print(response.json())
         print("UPDATED...")
-    elif (response.status_code == 403):
+    elif (response.status_code == 401):
         print("Token expired, refreshing token")
         token = refreshNoonesToken(collection)
     else:
