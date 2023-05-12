@@ -6,7 +6,6 @@ from pymongo.server_api import ServerApi
 
 PAXFUL_CLIENT_ID = os.environ.get('PAXFUL_CLIENT_ID')
 PAXFUL_CLIENT_SECRET = os.environ.get('PAXFUL_CLIENT_SECRET')
-<<<<<<< HEAD
 NOONES_CLIENT_ID = os.environ.get(NOONES_CLIENT_IDB')
 NOONES_CLIENT_SECRET = os.environ.get('NOONES_CLIENT_SECRET')
 MONGO_DB = os.environ.get('MONGO_DB')
@@ -16,16 +15,6 @@ def getNoonesAccessToken() -> list:
     response2 = requests.post('https://accounts.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': PAXFUL_CLIENT_ID, 'client_secret': PAXFUL_CLIENT_SECRET})
     if response.status_code == 200 and response2.status_code == 200:
         print(response.status_code, response2.status_code)
-=======
-NOONES_CLIENT_ID = os.environ.get('NOONES_CLIENT_ID')
-NOONES_CLIENT_SECRET = os.environ.get('NOONES_CLIENT_SECRET')
-MONGO_DB = os.environ.get('MONGO_DB')
-
-def getNoonesAccessToken(noones_client_id = NOONES_CLIENT_ID, noones_client_secret = NOONES_CLIENT_SECRET, paxful_client_id = PAXFUL_CLIENT_ID, paxful_client_secret = PAXFUL_CLIENT_SECRET) -> list:
-    response = requests.post('https://auth.noones.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
-    response2 = requests.post('https://auth.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
-    if response.status_code == 200 and response2.status_code:
->>>>>>> bc4ba86 (sds)
         return [response.json(), response2.json()]
     else:
         raise Exception("({0}, {1}) Error obtaining access token".format(response.status_code, response2.status_code))
@@ -38,19 +27,11 @@ def insertNewNoonesToken(collection):
     return [token_json[0]["access_token"], token_json[1]["access_token"]]
     
 def retrieveNoonesToken(collection):
-<<<<<<< HEAD
     return [collection.find_one({'client_id': NOONES_CLIENT_ID}), collection.find_one({'client_id': PAXFUL_CLIENT_ID})] # ["token_json"]["access_token"],
-=======
-    return [collection.find_one({'client_id': NOONES_CLIENT_ID}), collection.find_one({'client_id': NOONES_CLIENT_ID})]
->>>>>>> bc4ba86 (sds)
 
 def updateNoonesToken(collection, new_json1, new_json2):
     collection.update_one({'client_id': NOONES_CLIENT_ID}, {'$set': {'token_json': new_json1}})
     collection.update_one({'client_id': PAXFUL_CLIENT_ID}, {'$set': {'token_json': new_json2}})
-<<<<<<< HEAD
-=======
-    print("Token updated")
->>>>>>> bc4ba86 (sds)
     return [new_json1["access_token"], new_json2["access_token"]]
     
 def refreshNoonesToken(collection):
@@ -62,7 +43,6 @@ def initialise():
     db = client['Noones']
     collection = db['noonesJWT']
     try:
-<<<<<<< HEAD
         token1, token2 = retrieveNoonesToken(collection)
         token1 = token1["token_json"]["access_token"]
         token2 = token2["token_json"]["access_token"]
@@ -79,21 +59,6 @@ def run():
         print("UPDATED...")
     elif (response1.status_code == 401): # or response2.status_code == 401):
         print("({0}, {1})Error validating access token".format(response1.json(), response2.json()))
-=======
-        token1, token2 = retrieveNoonesToken(collection)["token_json"]["access_token"]
-    except TypeError:
-        print("New user detected, creating a new token...")
-        token = insertNewNoonesToken(collection)
-
-def run():
-    global token1, token2
-    response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token)})
-    response2 = requests.post("https://api.paxful.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token)})
-    if (response1.status_code == 200 and response2.status_code == 200):
-        #print(response.json())
-        print("UPDATED...")
-    elif (response1.status_code == 401 or response2.status_code == 401):
->>>>>>> bc4ba86 (sds)
         print("Token expired, refreshing token")
         token1, token2 = refreshNoonesToken(collection)
     else:
