@@ -1,5 +1,5 @@
 name: Deploy to AWS Lambda
-on: [push]
+#on: [push]
 jobs:
   deploy:
     runs-on: ubuntu-latest
