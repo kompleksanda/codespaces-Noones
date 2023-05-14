@@ -50,7 +50,7 @@ def initialise():
         print("New user detected, creating a new token...")
         token1, token2 = insertNewNoonesToken(collection)
         
-def run():
+def run(event, context):
     global token1, token2
     response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token1)})
     #response2 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token2)})
@@ -65,7 +65,6 @@ def run():
         raise Exception("({0}, {1})Error validating access token".format(response1.status_code, response2.status_code))
 
 initialise()
-
-while True:
-    run()
-    time.sleep(60)
+#while True:
+#    run()
+#    time.sleep(60)
