@@ -6,7 +6,7 @@ from pymongo.server_api import ServerApi
 
 PAXFUL_CLIENT_ID = os.environ.get('PAXFUL_CLIENT_ID')
 PAXFUL_CLIENT_SECRET = os.environ.get('PAXFUL_CLIENT_SECRET')
-NOONES_CLIENT_ID = os.environ.get('NOONES_CLIENT_DB')
+NOONES_CLIENT_ID = os.environ.get('NOONES_CLIENT_ID')
 NOONES_CLIENT_SECRET = os.environ.get('NOONES_CLIENT_SECRET')
 MONGO_DB = os.environ.get('MONGO_DB')
 
@@ -66,7 +66,6 @@ def run(event, context):
 
 initialise()
 run()
-
 #while True:
 #    run()
 #    time.sleep(60)
