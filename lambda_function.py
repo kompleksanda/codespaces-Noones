@@ -65,7 +65,6 @@ def run(event, context):
         raise Exception("({0}, {1})Error validating access token".format(response1.status_code, response2.status_code))
 
 initialise()
-run()
 #while True:
 #    run()
 #    time.sleep(60)
