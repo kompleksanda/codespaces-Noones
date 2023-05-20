@@ -53,11 +53,11 @@ def initialise():
 def lambda_handler(event, context):
     global token1, token2
     response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token1)})
-    #response2 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token2)})
-    if (response1.status_code == 200): # and response2.status_code == 200):
+    response2 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token2)})
+    if (response1.status_code == 200 and response2.status_code == 200):
         #print(response.json())
         print("UPDATED...")
-    elif (response1.status_code == 401): # or response2.status_code == 401):
+    elif (response1.status_code == 401 or response2.status_code == 401):
         print("({0}, {1})Error validating access token".format(response1.json(), response2.json()))
         print("Token expired, refreshing token")
         token1, token2 = refreshNoonesToken(collection)
