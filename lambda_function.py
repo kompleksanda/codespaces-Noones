@@ -28,7 +28,7 @@ def insertNewNoonesToken(collection):
     insert_result1 = collection.insert_one({'client_id' : NOONES_CLIENT_ID, 'token_json': token_json[0]})
     insert_result2 = collection.insert_one({'client_id' : PAXFUL_CLIENT_ID, 'token_json': token_json[1]})
     insert_result3 = collection.insert_one({'client_id' : PAXFUL_CLIENT_ID_2, 'token_json': token_json[2]})
-    print("Inserted token, document IDs {0}, {1}, {2}".format(insert_result1.inserted_id, insert_result2.inserted_id, , insert_result3.inserted_id))
+    print("Inserted token, document IDs {0}, {1}, {2}".format(insert_result1.inserted_id, insert_result2.inserted_id, insert_result3.inserted_id))
     return [token_json[0]["access_token"], token_json[1]["access_token"], token_json[2]["access_token"]]
     
 def retrieveNoonesToken(collection):
