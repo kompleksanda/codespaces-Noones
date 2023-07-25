@@ -70,7 +70,7 @@ def lambda_handler(event, context):
         print("Token expired, refreshing token")
         token1, token2, token3 = refreshNoonesToken(collection)
     else:
-        raise Exception("({0}, {1}, {2})Error validating access token".format(response1.status_code, response2.status_code, string(response3)))
+        raise Exception("({0}, {1}, {2})Error validating access token".format(response1.status_code, response2.status_code, str(response3)))
 
 initialise()
 #while True:
