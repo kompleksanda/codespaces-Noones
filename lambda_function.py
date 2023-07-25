@@ -21,7 +21,7 @@ def getNoonesAccessToken() -> list:
         print(response.status_code, response2.status_code, response3.status_code)
         return [response.json(), response2.json(), response3.json()]
     else:
-        raise Exception("({0}, {1}, {2}) Error obtaining access token".format(response.status_code, response2.status_code, response3.json()))
+        raise Exception("({0}, {1}, {2}) Error obtaining access token".format(response.status_code, response2.status_code, response3.status_code))
 
 def insertNewNoonesToken(collection):
     token_json = getNoonesAccessToken()
@@ -61,16 +61,16 @@ def lambda_handler(event, context):
     global token1, token2, token3
     response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token1)})
     response2 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token2)})
-    response3 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token3)})
-    if (response1.status_code == 200 and response2.status_code == 200 and response3.status_code == 200):
+    #response3 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token3)})
+    if (response1.status_code == 200 and response2.status_code == 200):# and response3.status_code == 200):
         #print(response.json())
         print("UPDATED...")
-    elif (response1.status_code == 401 or response2.status_code == 401 or response3.status_code == 401):
+    elif (response1.status_code == 401 or response2.status_code == 401):# or response3.status_code == 401):
         print("({0}, {1}, {2})Error validating access token".format(response1.json(), response2.json(), response3.json()))
         print("Token expired, refreshing token")
         token1, token2, token3 = refreshNoonesToken(collection)
     else:
-        raise Exception("({0}, {1}, {2})Error validating access token".format(response1.status_code, response2.status_code, str(response3.content)))
+        raise Exception("({0}, {1})Error validating access token".format(response1.status_code, response2.status_code))#, response3.status_code))
 
 initialise()
 #while True:
