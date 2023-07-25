@@ -66,11 +66,11 @@ def lambda_handler(event, context):
         #print(response.json())
         print("UPDATED...")
     elif (response1.status_code == 401 or response2.status_code == 401 or response3.status_code == 401):
-        print("({0}, {1})Error validating access token".format(response1.json(), response2.json(), response3.json()))
+        print("({0}, {1}, {2})Error validating access token".format(response1.json(), response2.json(), response3.json()))
         print("Token expired, refreshing token")
         token1, token2, token3 = refreshNoonesToken(collection)
     else:
-        raise Exception("({0}, {1}, {2})Error validating access token".format(response1.status_code, response2.status_code, response3.status_code))
+        raise Exception("({0}, {1}, {2})Error validating access token".format(response1.status_code, response2.status_code, response3.json()))
 
 initialise()
 #while True:
