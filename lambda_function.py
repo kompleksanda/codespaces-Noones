@@ -21,7 +21,7 @@ def getNoonesAccessToken() -> list:
         print(response.status_code, response2.status_code, response3.status_code)
         return [response.json(), response2.json(), response3.json()]
     else:
-        raise Exception("({0}, {1}, {2}) Error obtaining access token".format(response.status_code, response2.status_code, response3.status_code))
+        raise Exception("({0}, {1}, {2}) Error obtaining access token".format(response.status_code, response2.status_code, response3.json()))
 
 def insertNewNoonesToken(collection):
     token_json = getNoonesAccessToken()
