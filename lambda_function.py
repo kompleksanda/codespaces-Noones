@@ -40,12 +40,12 @@ def insertNewNoonesToken(collection):
     Ttoken_json = getNoonesAccessToken()
     if Ttoken_json["PAXFUL"]:
         for client_id, token_json in  Ttoken_json["PAXFUL"].items():
-            insert_result1 = collection.insert_one({'client_id' : client_id, 'token_json': token_json})
+            insert_result1 = collection.insert_one({'client_id' : os.environ.get(client_id), 'token_json': token_json})
             print("Inserted token, document ID {0} for PAXFUL ID {1}".format(insert_result1.inserted_id, client_id))
             accessVariables["PAXFUL"][client_id] = token_json["access_token"]
     if Ttoken_json["NOONES"]:
         for client_id, token_json in  Ttoken_json["NOONES"].items():
-            insert_result1 = collection.insert_one({'client_id' : client_id, 'token_json': token_json})
+            insert_result1 = collection.insert_one({'client_id' : os.environ.get(client_id), 'token_json': token_json})
             print("Inserted token, document ID {0} for NOONES ID {1}".format(insert_result1.inserted_id), client_id)
             accessVariables["NOONES"][client_id] = token_json["access_token"]
     return accessVariables
@@ -54,21 +54,21 @@ def retrieveNoonesToken(collection):
     accessVariables = {"PAXFUL": {}, "NOONES": {}}
     if environmentVariables["PAXFUL"]:
         for client_id, client_secret in  environmentVariables["PAXFUL"].items():
-            accessVariables["PAXFUL"][client_id] = collection.find_one({'client_id': client_id})
+            accessVariables["PAXFUL"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})
     if environmentVariables["NOONES"]:
         for client_id, client_secret in  environmentVariables["NOONES"].items():
-            accessVariables["NOONES"][client_id] = collection.find_one({'client_id': client_id})
+            accessVariables["NOONES"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})
     return accessVariables
 
 def updateNoonesToken(collection, accessV):
     accessVariables = {"PAXFUL": {}, "NOONES": {}}
     if accessV["PAXFUL"]:
         for client_id, new_json in  accessV["PAXFUL"].items():
-            collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
+            collection.update_one({'client_id': os.environ.get(client_id)}, {'$set': {'token_json': new_json}})
             accessVariables["PAXFUL"][client_id] = accessV["PAXFUL"][client_id]["access_token"]
     if accessV["NOONES"]:
         for client_id, new_json in  accessV["NOONES"].items():
-            collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
+            collection.update_one({'client_id': os.environ.get(client_id)}, {'$set': {'token_json': new_json}})
             accessVariables["NOONES"][client_id] = accessV["NOONES"][client_id]["access_token"]
     return accessVariables
     
