@@ -48,7 +48,7 @@ def insertNewNoonesToken(collection):
     if Ttoken_json["NOONES"]:
         for client_id, token_json in  Ttoken_json["NOONES"].items():
             insert_result1 = collection.insert_one({'client_id' : os.environ.get(client_id), 'token_json': token_json})
-            print("Inserted token, document ID {0} for NOONES ID {1}".format(insert_result1.inserted_id), client_id)
+            print("Inserted token, document ID {0} for NOONES ID {1}".format(insert_result1.inserted_id, client_id))
             accessVariables["NOONES"][client_id] = token_json["access_token"]
     return accessVariables
     
@@ -84,8 +84,6 @@ def initialise():
     collection = db['noonesJWT']
     try:
         tokens = retrieveNoonesToken(collection)
-        print("=================")
-        print(tokens)
     except TypeError:
         print("New user(s) detected, creating a new token...")
         tokens = insertNewNoonesToken(collection)
