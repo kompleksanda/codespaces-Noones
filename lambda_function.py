@@ -24,7 +24,7 @@ def getNoonesAccessToken() -> list:
                 #print(response.json())
                 accessVariables["PAXFUL"][client_id] = response.json()
             else:
-                print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
+                print("({0}) Error obtaining access (PAXFUL) token for {1}".format(response.status_code, client_id))
                 #raise Exception("({0}) Error obtaining access token".format(response.status_code))
     if environmentVariables["NOONES"]:
         for client_id, client_secret in  environmentVariables["NOONES"].items():
@@ -33,7 +33,7 @@ def getNoonesAccessToken() -> list:
                 #print(response.json())
                 accessVariables["NOONES"][client_id] = response.json()
             else:
-                print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
+                print("({0}) Error obtaining access (NOONES) token for {1}".format(response.status_code, client_id))
                 #raise Exception("({0}) Error obtaining access token".format(response.status_code))
     return accessVariables
 
@@ -99,6 +99,7 @@ def lambda_handler(event, context):
             elif (response1.status_code == 401):
                 print("({0})Error validating access token(NOONES) for id {1}".format(response1.json(), client_id))
                 print("Token expired, refreshing token")
+                print(token)
                 tokens = refreshNoonesToken(collection)
             else:
                 raise Exception("({0})Error validating access token(NOONES) for id {1}".format(response1.status_code, client_id))
@@ -111,6 +112,7 @@ def lambda_handler(event, context):
             elif (response1.status_code == 401):
                 print("({0})Error validating access token(PAXFUL) for id {1}".format(response1.json(), client_id))
                 print("Token expired, refreshing token")
+                print(token)
                 tokens = refreshNoonesToken(collection)
             else:
                 raise Exception("({0})Error validating access token(PAXFUL) for id {1}".format(response1.status_code, client_id))
