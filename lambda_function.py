@@ -4,75 +4,114 @@ import os
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-PAXFUL_CLIENT_ID = os.environ.get('PAXFUL_CLIENT_ID')
-PAXFUL_CLIENT_SECRET = os.environ.get('PAXFUL_CLIENT_SECRET')
-PAXFUL_CLIENT_ID_2 = os.environ.get('PAXFUL_CLIENT_ID_2')
-PAXFUL_CLIENT_SECRET_2 = os.environ.get('PAXFUL_CLIENT_SECRET_2')
-
-NOONES_CLIENT_ID = os.environ.get('NOONES_CLIENT_ID')
-NOONES_CLIENT_SECRET = os.environ.get('NOONES_CLIENT_SECRET')
+environmentVariables = {
+    "PAXFUL": {
+        "PAXFUL_CLIENT_ID": "PAXFUL_CLIENT_SECRET",
+    },
+    "NOONES": {
+        "NOONES_CLIENT_ID": "NOONES_CLIENT_SECRET",
+        "NOONES_CLIENT_ID_2": "NOONES_CLIENT_SECRET_2"
+    }
+}
 MONGO_DB = os.environ.get('MONGO_DB')
 
 def getNoonesAccessToken() -> list:
-    response = requests.post('https://auth.noones.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': NOONES_CLIENT_ID, 'client_secret': NOONES_CLIENT_SECRET})
-    response2 = requests.post('https://accounts.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': PAXFUL_CLIENT_ID, 'client_secret': PAXFUL_CLIENT_SECRET})
-    response3 = requests.post('https://accounts.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': PAXFUL_CLIENT_ID_2, 'client_secret': PAXFUL_CLIENT_SECRET_2})
-    if response.status_code == 200 and response2.status_code == 200 and response3.status_code == 200:
-        print(response.status_code, response2.status_code, response3.status_code)
-        return [response.json(), response2.json(), response3.json()]
-    else:
-        raise Exception("({0}, {1}, {2}) Error obtaining access token".format(response.status_code, response2.status_code, response3.status_code))
+    accessVariables = {"PAXFUL": {}, "NOONES": {}}
+    if environmentVariables["PAXFUL"]:
+        for client_id, client_secret in  environmentVariables["PAXFUL"].items():
+            response = requests.post('https://accounts.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': os.environ.get(client_id), 'client_secret': os.environ.get(client_secret)})
+            if response.status_code == 200:
+                accessVariables["PAXFUL"][client_id] = response.json()
+            else:
+                print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
+                #raise Exception("({0}) Error obtaining access token".format(response.status_code))
+    if environmentVariables["NOONES"]:
+        for client_id, client_secret in  environmentVariables["NOONES"].items():
+            response = requests.post('https://auth.noones.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': os.environ.get(client_id), 'client_secret': os.environ.get(client_secret)})
+            if response.status_code == 200:
+                accessVariables["NOONES"][client_id] = response.json()
+            else:
+                print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
+                #raise Exception("({0}) Error obtaining access token".format(response.status_code))
+    return accessVariables
 
 def insertNewNoonesToken(collection):
-    token_json = getNoonesAccessToken()
-    insert_result1 = collection.insert_one({'client_id' : NOONES_CLIENT_ID, 'token_json': token_json[0]})
-    insert_result2 = collection.insert_one({'client_id' : PAXFUL_CLIENT_ID, 'token_json': token_json[1]})
-    insert_result3 = collection.insert_one({'client_id' : PAXFUL_CLIENT_ID_2, 'token_json': token_json[2]})
-    print("Inserted token, document IDs {0}, {1}, {2}".format(insert_result1.inserted_id, insert_result2.inserted_id, insert_result3.inserted_id))
-    return [token_json[0]["access_token"], token_json[1]["access_token"], token_json[2]["access_token"]]
+    accessVariables = {"PAXFUL": {}, "NOONES": {}}
+    Ttoken_json = getNoonesAccessToken()
+    if Ttoken_json["PAXFUL"]:
+        for client_id, token_json in  Ttoken_json["PAXFUL"].items():
+            insert_result1 = collection.insert_one({'client_id' : client_id, 'token_json': token_json})
+            print("Inserted token, document ID {0} for PAXFUL ID {1}".format(insert_result1.inserted_id, client_id))
+            accessVariables["PAXFUL"][client_id] = token_json["access_token"]
+    if Ttoken_json["NOONES"]:
+        for client_id, token_json in  Ttoken_json["NOONES"].items():
+            insert_result1 = collection.insert_one({'client_id' : client_id, 'token_json': token_json})
+            print("Inserted token, document ID {0} for NOONES ID {1}".format(insert_result1.inserted_id), client_id)
+            accessVariables["NOONES"][client_id] = token_json["access_token"]
+    return accessVariables
     
 def retrieveNoonesToken(collection):
-    return [collection.find_one({'client_id': NOONES_CLIENT_ID}), collection.find_one({'client_id': PAXFUL_CLIENT_ID}), collection.find_one({'client_id': PAXFUL_CLIENT_ID_2})] # ["token_json"]["access_token"],
+    accessVariables = {"PAXFUL": {}, "NOONES": {}}
+    if environmentVariables["PAXFUL"]:
+        for client_id, client_secret in  environmentVariables["PAXFUL"].items():
+            accessVariables["PAXFUL"][client_id] = collection.find_one({'client_id': client_id})
+    if environmentVariables["NOONES"]:
+        for client_id, client_secret in  environmentVariables["NOONES"].items():
+            accessVariables["NOONES"][client_id] = collection.find_one({'client_id': client_id})
+    return accessVariables
 
-def updateNoonesToken(collection, new_json1, new_json2, new_json3):
-    collection.update_one({'client_id': NOONES_CLIENT_ID}, {'$set': {'token_json': new_json1}})
-    collection.update_one({'client_id': PAXFUL_CLIENT_ID}, {'$set': {'token_json': new_json2}})
-    collection.update_one({'client_id': PAXFUL_CLIENT_ID_2}, {'$set': {'token_json': new_json3}})
-    return [new_json1["access_token"], new_json2["access_token"], new_json3["access_token"]]
+def updateNoonesToken(collection, accessV):
+    accessVariables = {"PAXFUL": {}, "NOONES": {}}
+    if accessV["PAXFUL"]:
+        for client_id, new_json in  accessV["PAXFUL"].items():
+            collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
+            accessVariables["PAXFUL"][client_id] = accessV["PAXFUL"]["access_token"]
+    if accessV["NOONES"]:
+        for client_id, new_json in  accessV["NOONES"].items():
+            collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
+            accessVariables["NOONES"][client_id] = accessV["NOONES"]["access_token"]
+    return accessVariables
     
 def refreshNoonesToken(collection):
-    return updateNoonesToken(collection, *getNoonesAccessToken())
+    return updateNoonesToken(collection, getNoonesAccessToken())
 
 def initialise():
-    global token1, token2, token3, collection
+    global tokens, collection
     client = MongoClient(MONGO_DB, server_api=ServerApi('1'))
     db = client['Noones']
     collection = db['noonesJWT']
     try:
-        token1, token2, token3 = retrieveNoonesToken(collection)
-        token1 = token1["token_json"]["access_token"]
-        token2 = token2["token_json"]["access_token"]
-        token3 = token3["token_json"]["access_token"]
+        tokens = retrieveNoonesToken(collection)
     except TypeError:
-        print("New user detected, creating a new token...")
-        token1, token2, token3 = insertNewNoonesToken(collection)
+        print("New user(s) detected, creating a new token...")
+        tokens = insertNewNoonesToken(collection)
         
 def lambda_handler(event, context):
-    global token1, token2, token3
-    response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token1)})
-    response2 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token2)})
-    #response3 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token3)})
-    if (response1.status_code == 200 and response2.status_code == 200):# and response3.status_code == 200):
-        #print(response.json())
-        print("UPDATED...")
-    elif (response1.status_code == 401 or response2.status_code == 401):# or response3.status_code == 401):
-        print("({0}, {1}, {2})Error validating access token".format(response1.json(), response2.json(), response3.json()))
-        print("Token expired, refreshing token")
-        token1, token2, token3 = refreshNoonesToken(collection)
-    else:
-        raise Exception("({0}, {1})Error validating access token".format(response1.status_code, response2.status_code))#, response3.status_code))
+    global tokens
+    if tokens["NOONES"]:
+        for client_id, token in tokens["NOONES"].items():
+            response1 = requests.post("https://api.noones.com/noones/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token)})
+            if (response1.status_code == 200):
+                #print(response1.json())
+                print("UPDATED (NOONES)... for {0}".format(client_id))
+            elif (response1.status_code == 401):
+                print("({0})Error validating access token(NOONES) for id {1}".format(response1.json(), client_id))
+                print("Token expired, refreshing token")
+                tokens = refreshNoonesToken(collection)
+            else:
+                raise Exception("({0})Error validating access token(NOONES) for id {1}".format(response1.status_code, client_id))
+    if tokens["PAXFUL"]:
+        for client_id, token in tokens["PAXFUL"].items():
+            response1 = requests.post("https://api.paxful.com/paxful/v1/user/me", headers={'content-type': 'application/x-www-form-urlencoded', 'Accept': 'application/json', "Authorization": "Bearer {0}".format(token)})
+            if (response1.status_code == 200):
+                #print(response1.json())
+                print("UPDATED (PAXFUL)... for {0}".format(client_id))
+            elif (response1.status_code == 401):
+                print("({0})Error validating access token(PAXFUL) for id {1}".format(response1.json(), client_id))
+                print("Token expired, refreshing token")
+                tokens = refreshNoonesToken(collection)
+            else:
+                raise Exception("({0})Error validating access token(PAXFUL) for id {1}".format(response1.status_code, client_id))
+    
 
 initialise()
-#while True:
-#    run()
-#    time.sleep(60)
