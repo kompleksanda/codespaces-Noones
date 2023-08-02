@@ -65,11 +65,11 @@ def updateNoonesToken(collection, accessV):
     if accessV["PAXFUL"]:
         for client_id, new_json in  accessV["PAXFUL"].items():
             collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
-            accessVariables["PAXFUL"][client_id] = accessV["PAXFUL"]["access_token"]
+            accessVariables["PAXFUL"][client_id] = accessV["PAXFUL"][client_id]["access_token"]
     if accessV["NOONES"]:
         for client_id, new_json in  accessV["NOONES"].items():
             collection.update_one({'client_id': client_id}, {'$set': {'token_json': new_json}})
-            accessVariables["NOONES"][client_id] = accessV["NOONES"]["access_token"]
+            accessVariables["NOONES"][client_id] = accessV["NOONES"][client_id]["access_token"]
     return accessVariables
     
 def refreshNoonesToken(collection):
