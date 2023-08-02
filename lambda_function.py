@@ -56,10 +56,10 @@ def retrieveNoonesToken(collection):
     accessVariables = {"PAXFUL": {}, "NOONES": {}}
     if environmentVariables["PAXFUL"]:
         for client_id, client_secret in  environmentVariables["PAXFUL"].items():
-            accessVariables["PAXFUL"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})["access_token"]
+            accessVariables["PAXFUL"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})
     if environmentVariables["NOONES"]:
         for client_id, client_secret in  environmentVariables["NOONES"].items():
-            accessVariables["NOONES"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})["access_token"]
+            accessVariables["NOONES"][client_id] = collection.find_one({'client_id': os.environ.get(client_id)})
     return accessVariables
 
 def updateNoonesToken(collection, accessV):
