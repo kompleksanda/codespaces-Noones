@@ -21,6 +21,7 @@ def getNoonesAccessToken() -> list:
         for client_id, client_secret in  environmentVariables["PAXFUL"].items():
             response = requests.post('https://accounts.paxful.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': os.environ.get(client_id), 'client_secret': os.environ.get(client_secret)})
             if response.status_code == 200:
+                print(response.json())
                 accessVariables["PAXFUL"][client_id] = response.json()
             else:
                 print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
@@ -29,6 +30,7 @@ def getNoonesAccessToken() -> list:
         for client_id, client_secret in  environmentVariables["NOONES"].items():
             response = requests.post('https://auth.noones.com/oauth2/token', headers={'content-type': 'application/x-www-form-urlencoded'}, data={'grant_type': 'client_credentials', 'client_id': os.environ.get(client_id), 'client_secret': os.environ.get(client_secret)})
             if response.status_code == 200:
+                print(response.json())
                 accessVariables["NOONES"][client_id] = response.json()
             else:
                 print("({0}) Error obtaining access token for {1}".format(response.status_code, client_id))
