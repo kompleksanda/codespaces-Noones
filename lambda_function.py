@@ -7,6 +7,7 @@ from pymongo.server_api import ServerApi
 environmentVariables = {
     "PAXFUL": {
         "PAXFUL_CLIENT_ID": "PAXFUL_CLIENT_SECRET",
+        "PAXFUL_CLIENT_ID_2": "PAXFUL_CLIENT_SECRET_2"
     },
     "NOONES": {
         "NOONES_CLIENT_ID": "NOONES_CLIENT_SECRET",
